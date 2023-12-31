@@ -1,6 +1,5 @@
 package com.alumnione.ecommerce.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "carts")
@@ -33,6 +31,7 @@ public class Cart {
     private List<Cellphone> cellphones;
 
     @Column(name = "last_updated")
+    //TODO: is this necessary?
     private LocalDateTime lastUpdated;
 
     @OneToOne(fetch=FetchType.LAZY, orphanRemoval = true)
