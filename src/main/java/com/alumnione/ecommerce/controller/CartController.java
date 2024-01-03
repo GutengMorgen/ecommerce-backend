@@ -40,8 +40,8 @@ public class CartController {
         return service.addItem(id, idItem);
     }
 
-    @DeleteMapping(path = "{id}/item/{index}")
-    public ResponseEntity<CartReturnDto> deleteItem(@PathVariable Long id, @PathVariable short index) {
-        return service.deleteItem(id, index);
+    @DeleteMapping(path = "{id}/item/{cellId}")
+    public ResponseEntity<CartReturnDto> deleteItem(@PathVariable Long id, @PathVariable long cellId) {
+        return service.deleteItem(id, cellId);
     }
 }

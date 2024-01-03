@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -23,17 +24,14 @@ public class CartServiceImp implements CartService {
     @Override
     public ResponseEntity<CartReturnDto> get(long id) {
         Cart cart = getEntity(cartRepository, id);
-        entityNotFound(cart);
-        if (cart == null)
-            return ResponseEntity.notFound().build();
-//        return ResponseEntity.notFound().header("message","item not found").build();
+        if (cart == null) return ResponseEntity.notFound().header("message", "Entity id not found").build();
 
         return ResponseEntity.ok(new CartReturnDto(cart));
     }
 
-    private ResponseEntity<CartReturnDto> entityNotFound(Object entity) {
-        if (entity == null)
-            return ResponseEntity.notFound().build();
+    //TODO: make this thing works
+    private ResponseEntity<CartReturnDto> entityNotFound(String message, Object entity) {
+        if (entity == null) return ResponseEntity.notFound().header("message", message).build();
         return null;
     }
 
@@ -41,8 +39,7 @@ public class CartServiceImp implements CartService {
     @Override
     public ResponseEntity<CartReturnDto> deleteAll(long id) {
         Cart cart = getEntity(cartRepository, id);
-        if (cart == null)
-            return ResponseEntity.notFound().build();
+        if (cart == null) return ResponseEntity.notFound().build();
 
         cart.getCellphones().clear();
         cartRepository.save(cart);
@@ -52,34 +49,49 @@ public class CartServiceImp implements CartService {
     @Transactional(rollbackOn = Exception.class)
     @Override
     public ResponseEntity<CartReturnDto> addItem(long cartId, long cellId) {
-        //TODO: only add if no exits in the current list
-        //TODO: update the datetime when a item is add or delete
         Cart cart = getEntity(cartRepository, cartId);
         Cellphone cell = getEntity(cellRepository, cellId);
-        if(cart == null || cell == null)
-            return ResponseEntity.notFound().build();
+        if (cart == null || cell == null) return ResponseEntity.notFound().build();
 
-        if (cart.getCellphones().contains(cell))
-            //TODO: modify the quantity of the item
-            cart.getCellphones().set(cart.getCellphones().indexOf(cell), cell);
-        else
-            cart.getCellphones().add(cell);
+        List<Cellphone> list = cart.getCellphones();
+        int index = list.indexOf(cell);
+        if (index != -1) {
+            cell.setQuantity(cell.getQuantity() + 1);
+            list.set(index, cell);
+        } else {
+            cell.setQuantity(1);
+            list.add(cell);
+        }
 
         cart.setLastUpdated(LocalDateTime.now());
         cartRepository.save(cart);
         return ResponseEntity.ok(new CartReturnDto(cart));
     }
 
-    //FIX: validate the index instead of the id of the cell
     @Transactional(rollbackOn = Exception.class)
     @Override
-    public ResponseEntity<CartReturnDto> deleteItem(long id, short index) {
+    public ResponseEntity<CartReturnDto> deleteItem(long id, long cellId) {
         Cart cart = getEntity(cartRepository, id);
-        if(cart == null)
-            return ResponseEntity.notFound().build();
+        if (cart == null) return ResponseEntity.notFound().build();
 
         List<Cellphone> cellphones = cart.getCellphones();
-        if(index < 0 || index >= cellphones.size())
+//        int index = -1;
+//        for (Cellphone cel : cellphones) {
+//            if (cel.getId().equals(cellId)) {
+//                index = cellphones.indexOf(cel);
+//                System.out.println("using for " + index);
+//                break;
+//            } else {
+//                System.out.println("using for " + index);
+////                return ResponseEntity.notFound().build();
+//            }
+//        }
+        int index = IntStream.range(0, cellphones.size())
+                .filter(i -> cellphones.get(i).getId().equals(cellId))
+                .findFirst()
+                .orElse(-1);
+        System.out.println("using intStream " + index);
+        if (index == -1)
             return ResponseEntity.notFound().build();
 
         cellphones.remove(index);

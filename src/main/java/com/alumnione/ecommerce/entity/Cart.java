@@ -21,7 +21,7 @@ public class Cart {
     @Column(nullable = false)
     private Long id;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name="cart_cell",
             joinColumns = @JoinColumn(name = "cart_id"),

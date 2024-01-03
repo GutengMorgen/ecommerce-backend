@@ -7,5 +7,5 @@ public interface CartService {
     ResponseEntity<CartReturnDto> get(long id);
     ResponseEntity<CartReturnDto> deleteAll(long id);
     ResponseEntity<CartReturnDto> addItem(long cartId, long cellId);
-    ResponseEntity<CartReturnDto> deleteItem(long id, short index);
+    ResponseEntity<CartReturnDto> deleteItem(long id, long cellId);
 }
