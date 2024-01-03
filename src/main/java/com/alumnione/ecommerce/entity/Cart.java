@@ -27,7 +27,6 @@ public class Cart {
             joinColumns = @JoinColumn(name = "cart_id"),
             inverseJoinColumns = @JoinColumn(name = "cellphone_id")
     )
-    //list to get the cellphones in order
     private List<Cellphone> cellphones;
 
     @Column(name = "last_updated")

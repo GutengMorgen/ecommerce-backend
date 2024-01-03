@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -24,22 +23,16 @@ public class CartServiceImp implements CartService {
     @Override
     public ResponseEntity<CartReturnDto> get(long id) {
         Cart cart = getEntity(cartRepository, id);
-        if (cart == null) return ResponseEntity.notFound().header("message", "Entity id not found").build();
+        if (cart == null) return notFound("Cart");
 
         return ResponseEntity.ok(new CartReturnDto(cart));
-    }
-
-    //TODO: make this thing works
-    private ResponseEntity<CartReturnDto> entityNotFound(String message, Object entity) {
-        if (entity == null) return ResponseEntity.notFound().header("message", message).build();
-        return null;
     }
 
     @Transactional(rollbackOn = Exception.class)
     @Override
     public ResponseEntity<CartReturnDto> deleteAll(long id) {
         Cart cart = getEntity(cartRepository, id);
-        if (cart == null) return ResponseEntity.notFound().build();
+        if (cart == null) return notFound("Cart");
 
         cart.getCellphones().clear();
         cartRepository.save(cart);
@@ -51,7 +44,8 @@ public class CartServiceImp implements CartService {
     public ResponseEntity<CartReturnDto> addItem(long cartId, long cellId) {
         Cart cart = getEntity(cartRepository, cartId);
         Cellphone cell = getEntity(cellRepository, cellId);
-        if (cart == null || cell == null) return ResponseEntity.notFound().build();
+        if (cart == null) return notFound("Cart");
+        else if (cell == null) return notFound("Cellphone");
 
         List<Cellphone> list = cart.getCellphones();
         int index = list.indexOf(cell);
@@ -72,29 +66,15 @@ public class CartServiceImp implements CartService {
     @Override
     public ResponseEntity<CartReturnDto> deleteItem(long id, long cellId) {
         Cart cart = getEntity(cartRepository, id);
-        if (cart == null) return ResponseEntity.notFound().build();
+        if (cart == null) return notFound("Cart");
 
-        List<Cellphone> cellphones = cart.getCellphones();
-//        int index = -1;
-//        for (Cellphone cel : cellphones) {
-//            if (cel.getId().equals(cellId)) {
-//                index = cellphones.indexOf(cel);
-//                System.out.println("using for " + index);
-//                break;
-//            } else {
-//                System.out.println("using for " + index);
-////                return ResponseEntity.notFound().build();
-//            }
-//        }
-        int index = IntStream.range(0, cellphones.size())
-                .filter(i -> cellphones.get(i).getId().equals(cellId))
-                .findFirst()
-                .orElse(-1);
-        System.out.println("using intStream " + index);
-        if (index == -1)
-            return ResponseEntity.notFound().build();
+        List<Cellphone> list = cart.getCellphones();
+        Cellphone cell = list.stream()
+                .filter(c -> c.getId().equals(cellId))
+                .findFirst().orElse(null);
+        if (cell == null) return notFound("Cellphone");
 
-        cellphones.remove(index);
+        list.remove(cell);
         cart.setLastUpdated(LocalDateTime.now());
         cartRepository.save(cart);
         return ResponseEntity.ok(new CartReturnDto(cart));
@@ -102,5 +82,15 @@ public class CartServiceImp implements CartService {
 
     private <E> E getEntity(JpaRepository<E, Long> jpaRepository, long id) {
         return jpaRepository.findById(id).orElse(null);
+    }
+
+    private ResponseEntity<CartReturnDto> notFound(String entity) {
+        return ResponseEntity.notFound().header("message", entity + " id not found").build();
+    }
+
+    //TODO: make this thing works
+    private ResponseEntity<CartReturnDto> entityNotFound(String message, Object entity) {
+        if (entity == null) return ResponseEntity.notFound().header("message", message).build();
+        return null;
     }
 }
