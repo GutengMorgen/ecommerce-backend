@@ -3,8 +3,7 @@ package com.alumnione.ecommerce.entity;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.alumnione.ecommerce.entity.Cart;
-import com.alumnione.ecommerce.entity.Order;
+import com.alumnione.ecommerce.enumeration.UserType;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -24,7 +23,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long userId;
+    private Long id;
 
     @Column(name = "first_name")
     private String firstName;
@@ -40,12 +39,13 @@ public class User {
     private String address;
 
     @Column(name = "user_type")
-    private String userType;
+    @Enumerated(value = EnumType.STRING)
+    private UserType userType;
 
     @OneToMany(mappedBy = "user")
     private Set<Order> orders = new HashSet<>();
 
+//  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     private Cart cart;
-
 }

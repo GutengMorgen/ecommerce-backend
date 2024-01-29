@@ -2,6 +2,7 @@ package com.alumnione.ecommerce.entity;
 
 import java.util.List;
 
+import com.alumnione.ecommerce.enumeration.EOrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,16 +19,18 @@ import lombok.Setter;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_order")
-    private Long orderId;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "order_status")
-    private String orderStatus;
+    @Enumerated(EnumType.STRING)
+    private EOrderStatus orderStatus;
 
     @Column(name = "order_created_at")
     private String orderCreatedAt;
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne( cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "invoice_id")
     private Invoice invoice;
 
     @ManyToOne
@@ -36,10 +39,10 @@ public class Order {
 
     @ManyToMany
     @JoinTable(
-    name = "cellphones",
-    joinColumns = @JoinColumn(name = "product_id"),
-    inverseJoinColumns = @JoinColumn(name = "id")
+    name = "order_cell",
+        joinColumns = @JoinColumn(name = "cellphone_id"),
+        inverseJoinColumns = @JoinColumn(name = "order_id")
     )
-    private List<Cellphone> productId;
+    private List<Cellphone> cellphones;
 
 }
