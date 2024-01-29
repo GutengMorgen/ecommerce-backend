@@ -5,7 +5,7 @@ import com.alumnione.ecommerce.dto.CellphoneDataUpdateDto;
 import com.alumnione.ecommerce.entity.Cellphone;
 import com.alumnione.ecommerce.service.CellphoneService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,13 +18,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 // TODO: agregar el manejo de excepciones
 // TODO: agregar el manejo de errores
 @RestController
-@RequestMapping("/cellphones")
+@RequestMapping("cellphones")
+@RequiredArgsConstructor
 public class CellphoneController {
+    private final CellphoneService cellphoneService;
 
-    @Autowired
-    CellphoneService cellphoneService;
-
-    @PostMapping
+    @PostMapping("c")
     public ResponseEntity<Cellphone> createCellphone(@RequestBody @Valid CellphoneCreationDto cellphoneCreationDto, UriComponentsBuilder uriComponentsBuilder) {
         return cellphoneService.createCellphone(cellphoneCreationDto, uriComponentsBuilder);
     }

@@ -4,7 +4,7 @@ import com.alumnione.ecommerce.dto.CellphoneCreationDto;
 import com.alumnione.ecommerce.dto.CellphoneDataUpdateDto;
 import com.alumnione.ecommerce.entity.Cellphone;
 import com.alumnione.ecommerce.repository.CellphoneRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,10 +15,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @Service
+@RequiredArgsConstructor
 public class CellphoneServiceImpl implements CellphoneService {
-
-    @Autowired
-    private CellphoneRepository cellphoneRepository;
+    private final CellphoneRepository cellphoneRepository;
 
     @Override
     public ResponseEntity<Cellphone> createCellphone(CellphoneCreationDto cellphoneCreationDto, UriComponentsBuilder uriComponentsBuilder) {
